@@ -1,0 +1,13 @@
+[api]
+# 0.0.0.0 to expose
+api_ip = "0.0.0.0"
+api_port = 8881
+# in minutes
+session_cleaning_interval = 30
+
+[api.https]
+enabled = false
+cert_path = "/etc/ssl/certs/example.com.CABundle.crt"
+key_path = "/etc/ssl/private/example.com.key"
+# leave empty string if not using bundle
+ca_bundle_path = ""
