@@ -1,4 +1,4 @@
-use actix_web::{web, App, HttpServer};
+use actix_web::{middleware::Logger, web, App, HttpServer};
 use health::info;
 use product::product_info;
 use anyhow::{Ok, Result};
@@ -7,9 +7,10 @@ pub mod health;
 pub mod product;
 
 #[actix_web::main]
-async fn start_api() -> Result<()> {
+pub async fn start_api() -> Result<()> {
 let _ = HttpServer::new(|| {
         App::new()
+            .wrap(Logger::default())
             .service(info)
             .service(
                 web::scope("/v1/aletheia")

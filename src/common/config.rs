@@ -1,11 +1,11 @@
 use std::path::PathBuf;
 
 use serde::Deserialize;
-use lazy_static::lazy_static;
 
 #[derive(Deserialize)]
 pub struct Config {
     pub api: ApiConfig,
+    pub logger: LoggerConfig
 }
 
 #[derive(Deserialize)]
@@ -13,7 +13,6 @@ pub struct ApiConfig {
     pub api_ip: String,
     pub api_port: u16,
     pub https: HttpsConfig,
-    pub session_cleaning_interval: u64,
 }
 
 #[derive(Deserialize)]
@@ -22,6 +21,15 @@ pub struct HttpsConfig {
     pub cert_path: String,
     pub key_path: String,
     pub ca_bundle_path: String,
+}
+
+#[derive(Deserialize)]
+pub struct LoggerConfig {
+    pub filepath : String,
+    pub rotation : String,
+    pub global: String,
+    pub tls: String,
+    pub api: String,
 }
 
 impl Config {

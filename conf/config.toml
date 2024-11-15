@@ -1,0 +1,22 @@
+[api]
+# 0.0.0.0 to expose
+api_ip = "0.0.0.0"
+api_port = 8881
+
+[api.https]
+enabled = false
+cert_path = ""
+key_path = ""
+# leave empty string if not using bundle
+ca_bundle_path = ""
+
+[logger]
+filepath = "logs"
+
+# Set the rotation : daily | hourly | minutely | never
+rotation = "daily"
+
+# trace | debug | info | warning | error
+global = "info"
+tls = "info"
+api = "debug"
