@@ -1,4 +1,5 @@
-use aletheia_server::{common::config::CONFIG, routes::start_api};
+use aletheia_server::routes::hub::start_api;
+use aletheia_server::common::config::CONFIG;
 use tracing::info;
 use tracing_appender::rolling;
 use tracing_subscriber::layer::SubscriberExt;
