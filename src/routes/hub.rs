@@ -3,11 +3,11 @@ use std::sync::Arc;
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use anyhow::{Ok, Result};
 use health::info;
-use product_routes::product_info;
+use product_info::product_info;
 
 use crate::db::{mongodb::MongodbOFF, product_trait::ProductTrait};
 
-use super::{health, product_routes};
+use super::{health, product_info::{self, get_products_list}};
 
 pub struct AppState {
     pub db: Arc<dyn ProductTrait + Send + Sync>,
@@ -30,7 +30,8 @@ pub async fn start_api() -> Result<()> {
             .service(info)
             .service(
                 web::scope("/v1/aletheia")
-                    .route("/product/{barcode}", web::get().to(product_info)),
+                    .route("/products/{barcode}", web::get().to(product_info))
+                    .route("/products/search", web::post().to(get_products_list))
             )
     })
     .bind(("127.0.0.1", 8080))?
