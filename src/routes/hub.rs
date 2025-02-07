@@ -29,7 +29,7 @@ pub async fn start_api() -> Result<()> {
             .app_data(state.clone())
             .service(info)
             .service(
-                web::scope("/v1/aletheia")
+                web::scope("api/v1/aletheia")
                     .route("/products/{barcode}", web::get().to(product_info))
                     .route("/products/search", web::post().to(get_products_list))
             )
