@@ -1,3 +1,4 @@
+use std::env;
 use std::path::PathBuf;
 
 use serde::Deserialize;
@@ -5,7 +6,8 @@ use serde::Deserialize;
 #[derive(Deserialize)]
 pub struct Config {
     pub api: ApiConfig,
-    pub logger: LoggerConfig
+    pub logger: LoggerConfig,
+    pub database: DatabaseConfig,
 }
 
 #[derive(Deserialize)]
@@ -32,11 +34,22 @@ pub struct LoggerConfig {
     pub api: String,
 }
 
+#[derive(Deserialize)]
+pub struct DatabaseConfig {
+    pub url: String,
+}
+
 impl Config {
     pub fn from_file(path: &str) -> Result<Self, Box<dyn std::error::Error>> {
         let contents = std::fs::read_to_string(path)?;
-        let config: Self = toml::from_str(&contents)?;
-        return Ok(config);
+        let mut config: Self = toml::from_str(&contents)?;
+
+        // Override database URL with environment variable if set
+        if let Ok(database_url) = env::var("DATABASE_URL") {
+            config.database.url = database_url;
+        }
+
+        Ok(config)
     }
 }
 

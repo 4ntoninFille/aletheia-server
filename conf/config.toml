@@ -20,3 +20,7 @@ rotation = "daily"
 global = "info"
 tls = "info"
 api = "debug"
+
+## env variable DATABASE_URL overide this
+[database]
+url = "mongodb://localhost:27017"
