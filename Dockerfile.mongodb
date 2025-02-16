@@ -1,0 +1,19 @@
+FROM mongo:6
+
+# Install necessary tools
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create directory for MongoDB data
+RUN mkdir -p /data/db && \
+    chown -R mongodb:mongodb /data/db
+
+# Switch to mongodb user
+USER mongodb
+
+# Use the official MongoDB entrypoint
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+# Default command
+CMD ["mongod"]
