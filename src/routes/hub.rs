@@ -5,7 +5,7 @@ use anyhow::{Ok, Result};
 use health::info;
 use product_info::product_info;
 
-use crate::db::{mongodb::MongodbOFF, product_trait::ProductTrait};
+use crate::{common::config::CONFIG, db::{mongodb::MongodbOFF, product_trait::ProductTrait}};
 
 use super::{health, product_info::{self, get_products_list}};
 
@@ -34,7 +34,7 @@ pub async fn start_api() -> Result<()> {
                     .route("/products/search", web::post().to(get_products_list))
             )
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind((CONFIG.api.api_ip.clone(), CONFIG.api.api_port))?
     .run()
     .await;
     Ok(())
