@@ -1,6 +1,6 @@
-use aletheia_server::routes::hub::start_api;
+use aletheia_server::routes::hub::run_api;
 use aletheia_server::common::config::CONFIG;
-use tracing::info;
+use tracing::{error, info};
 use tracing_appender::rolling;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
@@ -49,10 +49,10 @@ fn init_logger() {
 }
 
 fn  main() {
-    info!("Aletheia server started");
     init_logger();
-    match start_api() {
-        Ok(_) => {info!("Server Started");},
-        Err(_) => {},
+    let rt = actix_web::rt::Runtime::new().unwrap();
+    match rt.block_on(run_api()) {
+        Ok(_) => {},
+        Err(e) => {error!("Server failed to start: {:?}", e);},
     };
-}
+}   

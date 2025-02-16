@@ -4,6 +4,7 @@ use actix_web::{middleware::Logger, web, App, HttpServer};
 use anyhow::{Ok, Result};
 use health::info;
 use product_info::product_info;
+use tracing::info;
 
 use crate::{common::config::CONFIG, db::{mongodb::MongodbOFF, product_trait::ProductTrait}};
 
@@ -14,9 +15,8 @@ pub struct AppState {
 }
 
 
-#[actix_web::main]
-pub async fn start_api() -> Result<()> {
-
+pub async fn run_api() -> Result<()> {
+    info!("Starting API server...");
     let mongodb_off = MongodbOFF::new().await;
     let db: Arc<dyn ProductTrait + Send + Sync> = Arc::new(mongodb_off);
 
