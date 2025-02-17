@@ -56,9 +56,11 @@ impl Config {
 lazy_static! {
     pub static ref CONFIG: Config = {
         #[cfg(not(target_os = "windows"))]
-        let config_paths = [
-            PathBuf::from("conf/config.toml"),
-        ];
+        let config_paths = if cfg!(debug_assertions) {
+            vec![PathBuf::from("conf/config.toml")]
+        } else {
+            vec![PathBuf::from("/etc/aletheia-server/config.toml")]
+        };
 
         config_paths
             .iter()

@@ -107,7 +107,6 @@ mongosh --host localhost --eval '
     // Show final result
     print("\nFinal collection count:", db.products.countDocuments());
     print("\nFinal sample document:");
-    print(JSON.stringify(db.products.findOne(), null, 2));
 ' openfoodfact
 
 echo "MongoDB import and filtering complete!"
