@@ -17,7 +17,7 @@ FROM --platform=linux/arm64/v8 ubuntu:22.04
 
 WORKDIR /app
 
-COPY /conf/config.toml /app/conf/config.toml
+COPY /conf/config.toml /etc/aletheia-server/config.toml
 COPY --from=builder /usr/src/app/target/release/aletheia-server /app/aletheia-server
 
 EXPOSE 8080
