@@ -1,7 +1,7 @@
 [api]
 # 0.0.0.0 to expose
 api_ip = "0.0.0.0"
-api_port = 8010
+api_port = "${PORT:8010}"
 
 [api.https]
 enabled = false
@@ -17,7 +17,7 @@ filepath = "logs"
 rotation = "daily"
 
 # trace | debug | info | warning | error
-global = "info"
+global = "debug"
 tls = "info"
 api = "debug"
 
