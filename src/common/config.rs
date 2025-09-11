@@ -49,6 +49,10 @@ impl Config {
             config.database.url = database_url;
         }
 
+        if let Ok(api_port_env) = env::var("PORT") {
+            config.api.api_port = api_port_env.parse().unwrap_or(config.api.api_port);
+        }
+
         Ok(config)
     }
 }

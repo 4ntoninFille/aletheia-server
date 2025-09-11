@@ -15,7 +15,7 @@ impl MongodbOFF {
         .await
         .expect("Failed to connect to MongoDB");
 
-        let db = client.database("openfoodfact");
+        let db = client.database("openfoodfacts");
 
         MongodbOFF {
             collection: db.collection("products"),
