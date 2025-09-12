@@ -16,7 +16,7 @@ pub async fn product_info(
     match state.db.get_product_info(barcode).await {
         Ok(product) => Ok(HttpResponse::Ok().json(product)),
         Err(ProductTraitError::NotFound) => Ok(HttpResponse::NotFound().json("Product not found")),
-        Err(_) => Ok(HttpResponse::InternalServerError().json("An error occurred")),
+        Err(ProductTraitError::DatabaseError(e)) => Ok(HttpResponse::InternalServerError().json(format!("db error occurred: {}", e))),
     }
 }
 
