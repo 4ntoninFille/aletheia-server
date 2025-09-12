@@ -1,25 +1,30 @@
-FROM --platform=linux/arm64/v8 ubuntu:22.04 as builder
-
-RUN apt-get update && apt-get install -y \
-    curl \
-    build-essential \
-    && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+# Use official Rust image for building
+FROM --platform=linux/amd64 rust:1.75 as builder
 
 WORKDIR /usr/src/app
 
+# Copy dependency files first for better caching
 COPY Cargo.toml Cargo.lock ./
 
-COPY . .
+# Create dummy source to build dependencies
+RUN mkdir src && echo "fn main() {}" > src/main.rs
+RUN cargo build --release
+RUN rm src/main.rs
 
-RUN . "$HOME/.cargo/env" && cargo build --release
+# Copy actual source code
+COPY src ./src
 
-FROM --platform=linux/arm64/v8 ubuntu:22.04
+# Build the actual application
+RUN cargo build --release
+
+# Runtime stage - use minimal image
+FROM --platform=linux/amd64 ubuntu:22.04
 
 WORKDIR /app
 
 COPY /conf/config.toml /etc/aletheia-server/config.toml
 COPY --from=builder /usr/src/app/target/release/aletheia-server /app/aletheia-server
 
-EXPOSE 8080
+EXPOSE 8010
 
 CMD ["/app/aletheia-server"]
