@@ -1,7 +1,8 @@
 use async_trait::async_trait;
+use tracing::error;
 use mongodb::{bson::doc, Client, Collection};
 
-use crate::models::product::Product;
+use crate::{common::config::CONFIG, models::product::Product};
 
 use super::product_trait::{ProductTrait, ProductTraitError};
 
@@ -11,9 +12,13 @@ pub struct MongodbOFF {
 
 impl MongodbOFF {
     pub async fn new() -> Self {
-        let client = Client::with_uri_str("mongodb://localhost:27017")
-        .await
-        .expect("Failed to connect to MongoDB");
+        let client = match Client::with_uri_str(CONFIG.database.url.as_str()).await {
+            Ok(client) => client,
+            Err(e) => {
+            error!("Failed to connect to MongoDB: {}", e);
+            panic!("Failed to connect to MongoDB");
+            }
+        };
 
         let db = client.database("openfoodfacts");
 

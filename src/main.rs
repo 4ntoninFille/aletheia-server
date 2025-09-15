@@ -10,7 +10,7 @@ use tracing_subscriber::{fmt, EnvFilter};
 fn init_logger() {
     info!("Initializing logger...");
     let logs_dir = CONFIG.logger.filepath.as_str();
-    let filename_prefix = "sakura.log";
+    let filename_prefix = "aletheia.log";
 
     let file_appender = match CONFIG.logger.rotation.as_str() {
         "daily" => rolling::daily(logs_dir, filename_prefix),

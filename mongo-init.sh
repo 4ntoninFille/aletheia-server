@@ -121,13 +121,28 @@ if (matchingDocs === 0) {
                 $match: matchCondition
             },
             {
-                // Project all desired fields, but don't require them to exist
+                // Project all desired fields, handling nested ecoscore_grade
                 $project: {
                     _id: 0,
                     code: { $ifNull: ['$code', ''] },
                     product_name: { $ifNull: ['$product_name', ''] },
                     nutriscore_grade: '$nutriscore_grade', // This is guaranteed to exist
-                    ecoscore_grade: { $ifNull: ['$ecoscore_grade', ''] }
+                    ecoscore_grade: { 
+                        $ifNull: [
+                            '$ecoscore_grade',  // Try root level first
+                            {
+                                $ifNull: [
+                                    '$ecoscore_data.grade',  // Then try nested
+                                    {
+                                        $ifNull: [
+                                            { $arrayElemAt: ['$ecoscore_tags', 0] },  // Then try first element of ecoscore_tags array
+                                            ''
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
                 }
             },
             {
