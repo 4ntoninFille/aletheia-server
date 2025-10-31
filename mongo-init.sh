@@ -79,12 +79,16 @@ if (sample) {
     print('Sample product_name:', sample.product_name);
     print('Sample nutriscore_grade:', sample.nutriscore_grade);
     print('Sample ecoscore_grade:', sample.ecoscore_grade);
+    print('Sample nova_group:', sample['nova-group'] || sample.nova_group);
+    if (sample.nutriments) {
+        print('Sample nova from nutriments:', sample.nutriments['nova-group'] || sample.nutriments.nova_group);
+    }
 }
 
 // FLEXIBLE FILTERING: Only require nutriscore_grade as mandatory
 // Other fields are optional but will be included if they exist
 const mandatoryFields = ['nutriscore_grade']; // Only nutriscore_grade is required
-const optionalFields = ['code', 'product_name', 'ecoscore_grade']; // These are nice to have
+const optionalFields = ['code', 'product_name', 'ecoscore_grade', 'nova-group']; // These are nice to have
 
 // Build match condition - only nutriscore_grade must exist and be valid
 let matchCondition = {};
@@ -116,17 +120,18 @@ if (matchingDocs === 0) {
     // Perform the filtering with flexible requirements
     try {
         db.products.aggregate([
+            // { $limit: 10000 }, // Uncomment for testing on smaller dataset
             {
                 // Only filter by mandatory fields (nutriscore_grade)
                 $match: matchCondition
             },
             {
-                // Project all desired fields, handling nested ecoscore_grade
+                // Project all desired fields, handling nested ecoscore_grade and nova_group
                 $project: {
                     _id: 0,
                     code: { $ifNull: ['$code', ''] },
                     product_name: { $ifNull: ['$product_name', ''] },
-                    nutriscore_grade: '$nutriscore_grade', // This is guaranteed to exist
+                    nutriscore_grade: '$nutriscore_grade',
                     ecoscore_grade: { 
                         $ifNull: [
                             '$ecoscore_grade',  // Try root level first
@@ -142,6 +147,29 @@ if (matchingDocs === 0) {
                                 ]
                             }
                         ]
+                    },
+                    nova_group: {
+                        $let: {
+                            vars: {
+                                novaValue: {
+                                    $ifNull: [
+                                        '$nova-group',
+                                        { $ifNull: ['$nova_group', 
+                                            { $ifNull: ['$nutriments.nova-group', 
+                                                { $ifNull: ['$nutriments.nova_group', null] }
+                                            ]}
+                                        ]}
+                                    ]
+                                }
+                            },
+                            in: {
+                                $cond: {
+                                    if: { $eq: ['$$novaValue', null] },
+                                    then: '',
+                                    else: { $toString: '$$novaValue' }
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -172,11 +200,13 @@ if (matchingDocs === 0) {
             const withProductName = db.products_filtered.countDocuments({ product_name: { $ne: '' } });
             const withEcoscore = db.products_filtered.countDocuments({ ecoscore_grade: { $ne: '' } });
             const withNutriscore = db.products_filtered.countDocuments({ nutriscore_grade: { $ne: '' } });
+            const withNova = db.products_filtered.countDocuments({ nova_group: { $ne: '' } });
             
             print('Products with code:', withCode, '(' + ((withCode/filteredCount)*100).toFixed(1) + '%)');
             print('Products with product_name:', withProductName, '(' + ((withProductName/filteredCount)*100).toFixed(1) + '%)');
             print('Products with ecoscore_grade:', withEcoscore, '(' + ((withEcoscore/filteredCount)*100).toFixed(1) + '%)');
             print('Products with nutriscore_grade:', withNutriscore, '(' + ((withNutriscore/filteredCount)*100).toFixed(1) + '%)');
+            print('Products with nova_group:', withNova, '(' + ((withNova/filteredCount)*100).toFixed(1) + '%)');
             
             // Show sample of filtered data
             print('\n=== SAMPLE DATA ===');
@@ -255,11 +285,13 @@ const withCode = db.products.countDocuments({ code: { $ne: '' } });
 const withProductName = db.products.countDocuments({ product_name: { $ne: '' } });
 const withEcoscore = db.products.countDocuments({ ecoscore_grade: { $ne: '' } });
 const withNutriscore = db.products.countDocuments({ nutriscore_grade: { $ne: '' } });
+const withNova = db.products.countDocuments({ nova_group: { $ne: '' } });
 
 print('Products with valid code:', withCode, '(' + ((withCode/finalCount)*100).toFixed(1) + '%)');
 print('Products with valid product_name:', withProductName, '(' + ((withProductName/finalCount)*100).toFixed(1) + '%)');
 print('Products with valid ecoscore_grade:', withEcoscore, '(' + ((withEcoscore/finalCount)*100).toFixed(1) + '%)');
 print('Products with valid nutriscore_grade:', withNutriscore, '(' + ((withNutriscore/finalCount)*100).toFixed(1) + '%)');
+print('Products with valid nova_group:', withNova, '(' + ((withNova/finalCount)*100).toFixed(1) + '%)');
 EOF
 
 # Show final statistics
